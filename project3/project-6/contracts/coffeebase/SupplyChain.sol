@@ -156,6 +156,8 @@ contract SupplyChain {
     }
   }
 
+
+
   // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
   function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string  _originFarmLatitude, string  _originFarmLongitude, string  _productNotes) public 
   {
@@ -163,6 +165,9 @@ contract SupplyChain {
     uint _productID = _upc + sku;
     Item memory newItem = Item({sku: sku, upc: _upc, ownerID: owner, originFarmerID: _originFarmerID, originFarmName: _originFarmName, originFarmInformation: _originFarmInformation, originFarmLatitude: _originFarmLatitude, originFarmLongitude: _originFarmLongitude, productID: _productID, productNotes:_productNotes,productPrice: 0, itemState: State.Harvested, distributorID: 0, retailerID: 0, consumerID: 0});
     items[_upc] = newItem;
+
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
     // Increment sku
     sku = sku + 1;
     // Emit the appropriate event
@@ -178,6 +183,10 @@ contract SupplyChain {
   {
     // Update the appropriate fields
     items[_upc].itemState = State.Processed;
+    
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+    
     // Emit the appropriate event
     emit Processed(_upc);
   }
@@ -191,6 +200,10 @@ contract SupplyChain {
   {
     // Update the appropriate fields
     items[_upc].itemState = State.Packed;
+
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+
     // Emit the appropriate event
     emit Packed(_upc);
   }
@@ -206,6 +219,9 @@ contract SupplyChain {
     items[_upc].ownerID = msg.sender;
     items[_upc].productPrice = _price;
     items[_upc].itemState = State.ForSale;
+
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
     
     // Emit the appropriate event
     emit ForSale(_upc);
@@ -230,6 +246,9 @@ contract SupplyChain {
     items[_upc].distributorID = buyer;
     items[_upc].itemState = State.Sold;
 
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+
     // Transfer money to farmer
     items[_upc].originFarmerID.transfer(price);
 
@@ -248,6 +267,10 @@ contract SupplyChain {
   {
     // Update the appropriate fields
     items[_upc].itemState = State.Shipped;
+
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+
     // Emit the appropriate event
     emit Shipped(_upc);
   }
@@ -266,6 +289,9 @@ contract SupplyChain {
     items[_upc].retailerID = retailer;
     items[_upc].itemState = State.Received;
     
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+
     // Emit the appropriate event
     emit Received(_upc);
 
@@ -285,9 +311,12 @@ contract SupplyChain {
     items[_upc].consumerID = consumer;
     items[_upc].itemState = State.Purchased;
 
+    bytes32 itemHistory = sha256(abi.encodePacked(items[_upc].upc, items[_upc].ownerID, items[_upc].itemState));
+    itemsHistory[_upc].push(string(abi.encodePacked(itemHistory)));
+
     // Emit the appropriate event
     emit Purchased(_upc);
-    
+
   }
 
   // Define a function 'fetchItemBufferOne' that fetches the data
