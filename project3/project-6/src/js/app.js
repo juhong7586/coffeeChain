@@ -127,8 +127,7 @@ App = {
         App.getMetaskAccountID();
 
         var processId = parseInt($(event.target).data('id'));
-        console.log('processId',processId);
-
+        
         switch(processId) {
             case 1:
                 return await App.harvestItem(event);
@@ -178,10 +177,13 @@ App = {
                 App.productNotes
             );
         }).then(function(result) {
-            $("#ftc-item").text(result);
+            var comment = document.createElement(result);
+            //$("#ftc-item").text(result);
+            $("#ftc-item").appendChild(comment);
             console.log('harvestItem',result);
         }).catch(function(err) {
-            console.log(err.message);
+            console.log(App.originFarmerID);
+            console.log(err);
         });
     },
 
