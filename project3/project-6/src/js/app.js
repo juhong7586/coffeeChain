@@ -127,6 +127,7 @@ App = {
         App.getMetaskAccountID();
 
         var processId = parseInt($(event.target).data('id'));
+        console.log('processId', processId);
         
         switch(processId) {
             case 1:
@@ -174,12 +175,12 @@ App = {
                 App.originFarmInformation, 
                 App.originFarmLatitude, 
                 App.originFarmLongitude, 
-                App.productNotes
+                App.productNotes, 
+                {from: App.metamaskAccountID}
             );
+
         }).then(function(result) {
-            var comment = document.createElement(result);
-            //$("#ftc-item").text(result);
-            $("#ftc-item").appendChild(comment);
+            $("#ftc-events").text(result);
             console.log('harvestItem',result);
         }).catch(function(err) {
             console.log(App.originFarmerID);
@@ -194,7 +195,7 @@ App = {
         App.contracts.SupplyChain.deployed().then(function(instance) {
             return instance.processItem(App.upc, {from: App.metamaskAccountID});
         }).then(function(result) {
-            $("#ftc-item").text(result);
+            //$("#ftc-events").text(result);
             console.log('processItem',result);
         }).catch(function(err) {
             console.log(err.message);
@@ -292,7 +293,7 @@ App = {
     ///   event.preventDefault();
     ///    var processId = parseInt($(event.target).data('id'));
         App.upc = $('#upc').val();
-        console.log('upc',App.upc);
+        console.log('upc', App.upc);
 
         App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.fetchItemBufferOne(App.upc);
@@ -331,7 +332,7 @@ App = {
         App.contracts.SupplyChain.deployed().then(function(instance) {
         var events = instance.allEvents(function(err, log){
           if (!err)
-            $("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
+            $("#ftc-events").append('<li>' + logs.event + ' - ' + logs.transactionHash + '</li>');
         });
         }).catch(function(err) {
           console.log(err.message);
